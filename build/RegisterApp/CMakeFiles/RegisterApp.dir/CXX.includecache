@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/lynx/src/ExpressDeviveryApp/RegisterApp/RegisterApp.cpp
+RegisterApp.h
+/home/lynx/src/ExpressDeviveryApp/RegisterApp/RegisterApp.h
+QVBoxLayout
+-
+
+/home/lynx/src/ExpressDeviveryApp/RegisterApp/RegisterApp.h
+QtGui
+-
+
+/home/lynx/src/ExpressDeviveryApp/build/RegisterApp/../../RegisterApp/RegisterApp.h
+QtGui
+-
+
+/home/lynx/src/ExpressDeviveryApp/build/RegisterApp/moc_RegisterApp.cxx
+../../RegisterApp/RegisterApp.h
+/home/lynx/src/ExpressDeviveryApp/build/RegisterApp/../../RegisterApp/RegisterApp.h
+

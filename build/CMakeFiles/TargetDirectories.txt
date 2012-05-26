@@ -1,0 +1,2 @@
+/home/lynx/src/ExpressDeviveryApp/build/CMakeFiles/ExpressDeviveryApp.dir
+/home/lynx/src/ExpressDeviveryApp/build/RegisterApp/CMakeFiles/RegisterApp.dir

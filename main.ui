@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>734</width>
+    <height>431</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QTableView" name="tableView"/>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetDefaultConstraint</enum>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="infoLabel">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>734</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuUser">
+    <property name="title">
+     <string>User</string>
+    </property>
+    <addaction name="actionLogin"/>
+    <addaction name="actionRegister"/>
+    <addaction name="separator"/>
+    <addaction name="actionInformation"/>
+   </widget>
+   <widget class="QMenu" name="menuOrder">
+    <property name="title">
+     <string>Order</string>
+    </property>
+    <addaction name="actionOrder_from_Me"/>
+    <addaction name="actionOrder"/>
+    <addaction name="separator"/>
+    <addaction name="actionNew_Order"/>
+    <addaction name="actionNew_Order_from_Home"/>
+   </widget>
+   <widget class="QMenu" name="menuOrderType">
+    <property name="title">
+     <string>Order Type</string>
+    </property>
+    <addaction name="actionOrder_Query"/>
+    <addaction name="actionModify_Type"/>
+   </widget>
+   <widget class="QMenu" name="menuStatistics">
+    <property name="title">
+     <string>Statistics</string>
+    </property>
+    <addaction name="actionToday"/>
+    <addaction name="actionOther_Time"/>
+   </widget>
+   <addaction name="menuUser"/>
+   <addaction name="menuOrder"/>
+   <addaction name="menuOrderType"/>
+   <addaction name="menuStatistics"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionLogin">
+   <property name="text">
+    <string>Login</string>
+   </property>
+  </action>
+  <action name="actionRegister">
+   <property name="text">
+    <string>Register</string>
+   </property>
+  </action>
+  <action name="actionInformation">
+   <property name="text">
+    <string>Information</string>
+   </property>
+  </action>
+  <action name="actionOrder_from_Me">
+   <property name="text">
+    <string>Order from Me</string>
+   </property>
+  </action>
+  <action name="actionOrder">
+   <property name="text">
+    <string>Order from Other User</string>
+   </property>
+  </action>
+  <action name="actionNew_Order">
+   <property name="text">
+    <string>New Order</string>
+   </property>
+  </action>
+  <action name="actionNew_Order_from_Home">
+   <property name="text">
+    <string>New Order from Home</string>
+   </property>
+  </action>
+  <action name="actionOrder_Query">
+   <property name="text">
+    <string>Type Query</string>
+   </property>
+  </action>
+  <action name="actionModify_Type">
+   <property name="text">
+    <string>Modify Type</string>
+   </property>
+  </action>
+  <action name="actionToday">
+   <property name="text">
+    <string>Today</string>
+   </property>
+  </action>
+  <action name="actionOther_Time">
+   <property name="text">
+    <string>Other Time</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,17 @@
+[Buildset]
+BuildItems=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x01\x00\x00\x00$\x00E\x00x\x00p\x00r\x00e\x00s\x00s\x00D\x00e\x00v\x00i\x00v\x00e\x00r\x00y\x00A\x00p\x00p)
+
+[CMake]
+BuildDirs=/home/lynx/src/ExpressDeviveryApp/build
+CMakeDir=/usr/share/cmake-2.8/Modules
+Current CMake Binary=file:///usr/bin/cmake
+CurrentBuildDir=file:///home/lynx/src/ExpressDeviveryApp/build
+CurrentInstallDir=file:///usr/local
+Extra Arguments=
+ProjectRootRelative=./
+
+[MakeBuilder]
+Number Of Jobs=1
+
+[Project]
+VersionControlSupport=kdevgit
