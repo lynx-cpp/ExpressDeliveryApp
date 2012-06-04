@@ -1,0 +1,36 @@
+#include "DateDialog.h"
+#include <QVBoxLayout>
+
+DateDialog::DateDialog(QWidget* parent, Qt::WindowFlags f): QDialog(parent, f)
+{
+    setLayout(new QVBoxLayout(this));
+    label = new QLabel(this);
+    dateEdit = new QDateEdit(this);
+    dateEdit->setDate(QDate::currentDate());
+    buttonBox = new QDialogButtonBox(
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel
+        ,Qt::Horizontal
+        ,this
+    );
+    connect(buttonBox, SIGNAL(accepted()),this, SLOT(accept()));
+    connect(buttonBox, SIGNAL(rejected()),this, SLOT(reject()));
+    
+    layout()->addWidget(label);
+    layout()->addWidget(dateEdit);
+    layout()->addWidget(buttonBox);
+}
+
+QDate DateDialog::getDate()
+{
+    return dateEdit->date();
+}
+
+void DateDialog::setText(const QString& value)
+{
+    label->setText(value);
+}
+
+DateDialog::~DateDialog()
+{
+
+}

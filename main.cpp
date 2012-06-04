@@ -1,11 +1,11 @@
 #include <QtGui/QApplication>
-#include "ExpressDeviveryApp.h"
+#include "ExpressDeliveryApp.h"
 
 
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
-    ExpressDeviveryApp foo;
+    ExpressDeliveryApp foo;
     foo.show();
     return app.exec();
 }

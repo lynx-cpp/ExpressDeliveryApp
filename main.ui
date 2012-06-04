@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>734</width>
-    <height>431</height>
+    <width>624</width>
+    <height>590</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>ExpressDeliveryApp</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -27,7 +27,198 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QPushButton" name="submitButton">
+        <property name="text">
+         <string>Submit</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="discardButton">
+        <property name="text">
+         <string>Discard</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="addButton">
+        <property name="text">
+         <string>Add</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="removeButton">
+        <property name="text">
+         <string>Remove</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="timeFilterGroupBox">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>150</height>
+         </size>
+        </property>
+        <property name="title">
+         <string>Time Filter</string>
+        </property>
+        <widget class="QLabel" name="filterFromLabel">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>50</y>
+           <width>200</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>From Time :</string>
+         </property>
+        </widget>
+        <widget class="QDateTimeEdit" name="dateTimeEdit_from">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>70</y>
+           <width>200</width>
+           <height>23</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="filterToLabel">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>90</y>
+           <width>200</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>To Time :</string>
+         </property>
+        </widget>
+        <widget class="QDateTimeEdit" name="dateTimeEdit_to">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>110</y>
+           <width>200</width>
+           <height>23</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="timeFilterCheckBox">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>30</y>
+           <width>200</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Enabled</string>
+         </property>
+        </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="idFilterGroupBox">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>100</height>
+         </size>
+        </property>
+        <property name="title">
+         <string>ID Filter</string>
+        </property>
+        <widget class="QCheckBox" name="idFilterCheckBox">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>20</y>
+           <width>201</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Enabled</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="fromIdLabel">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>40</y>
+           <width>61</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>From ID :</string>
+         </property>
+        </widget>
+        <widget class="QSpinBox" name="fromIdSpinBox">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>60</y>
+           <width>53</width>
+           <height>23</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_2">
+         <property name="geometry">
+          <rect>
+           <x>120</x>
+           <y>40</y>
+           <width>61</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>To ID :</string>
+         </property>
+        </widget>
+        <widget class="QSpinBox" name="toIdSpinBox">
+         <property name="geometry">
+          <rect>
+           <x>120</x>
+           <y>60</y>
+           <width>53</width>
+           <height>23</height>
+          </rect>
+         </property>
+        </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="refreshButton">
+        <property name="text">
+         <string>Refresh</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="infoLabel">
         <property name="minimumSize">
          <size>
           <width>200</width>
@@ -40,7 +231,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="infoLabel">
+       <widget class="QLabel" name="label">
         <property name="minimumSize">
          <size>
           <width>200</width>
@@ -61,7 +252,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>734</width>
+     <width>624</width>
      <height>21</height>
     </rect>
    </property>
@@ -70,6 +261,7 @@
      <string>User</string>
     </property>
     <addaction name="actionLogin"/>
+    <addaction name="actionLogout"/>
     <addaction name="actionRegister"/>
     <addaction name="separator"/>
     <addaction name="actionInformation"/>
@@ -82,7 +274,6 @@
     <addaction name="actionOrder"/>
     <addaction name="separator"/>
     <addaction name="actionNew_Order"/>
-    <addaction name="actionNew_Order_from_Home"/>
    </widget>
    <widget class="QMenu" name="menuOrderType">
     <property name="title">
@@ -96,11 +287,19 @@
      <string>Statistics</string>
     </property>
     <addaction name="actionToday"/>
-    <addaction name="actionOther_Time"/>
+    <addaction name="actionOtherTime"/>
+   </widget>
+   <widget class="QMenu" name="menuPlace_Info">
+    <property name="title">
+     <string>Place Info</string>
+    </property>
+    <addaction name="actionList_Place_Info"/>
+    <addaction name="actionNew_Place_Info"/>
    </widget>
    <addaction name="menuUser"/>
    <addaction name="menuOrder"/>
    <addaction name="menuOrderType"/>
+   <addaction name="menuPlace_Info"/>
    <addaction name="menuStatistics"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -126,17 +325,12 @@
   </action>
   <action name="actionOrder">
    <property name="text">
-    <string>Order from Other User</string>
+    <string>Order from All</string>
    </property>
   </action>
   <action name="actionNew_Order">
    <property name="text">
     <string>New Order</string>
-   </property>
-  </action>
-  <action name="actionNew_Order_from_Home">
-   <property name="text">
-    <string>New Order from Home</string>
    </property>
   </action>
   <action name="actionOrder_Query">
@@ -146,7 +340,7 @@
   </action>
   <action name="actionModify_Type">
    <property name="text">
-    <string>Modify Type</string>
+    <string>Add Type</string>
    </property>
   </action>
   <action name="actionToday">
@@ -154,9 +348,24 @@
     <string>Today</string>
    </property>
   </action>
-  <action name="actionOther_Time">
+  <action name="actionOtherTime">
    <property name="text">
     <string>Other Time</string>
+   </property>
+  </action>
+  <action name="actionLogout">
+   <property name="text">
+    <string>Logout</string>
+   </property>
+  </action>
+  <action name="actionList_Place_Info">
+   <property name="text">
+    <string>List Place Info</string>
+   </property>
+  </action>
+  <action name="actionNew_Place_Info">
+   <property name="text">
+    <string>New Place Info</string>
    </property>
   </action>
  </widget>

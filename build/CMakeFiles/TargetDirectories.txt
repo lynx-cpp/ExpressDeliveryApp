@@ -1,2 +1,5 @@
-/home/lynx/src/ExpressDeviveryApp/build/CMakeFiles/ExpressDeviveryApp.dir
-/home/lynx/src/ExpressDeviveryApp/build/RegisterApp/CMakeFiles/RegisterApp.dir
+/home/lynx/src/github_tmp/ExpressDeliveryApp/build/DateDialog/CMakeFiles/DateDialog.dir
+/home/lynx/src/github_tmp/ExpressDeliveryApp/build/CMakeFiles/ExpressDeliveryApp.dir
+/home/lynx/src/github_tmp/ExpressDeliveryApp/build/HistogramItem/CMakeFiles/HistogramItem.dir
+/home/lynx/src/github_tmp/ExpressDeliveryApp/build/UserInfo/CMakeFiles/UserInfo.dir
+/home/lynx/src/github_tmp/ExpressDeliveryApp/build/md5/CMakeFiles/md5.dir

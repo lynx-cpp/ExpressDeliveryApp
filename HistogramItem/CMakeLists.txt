@@ -1,0 +1,22 @@
+set(
+    HistogramItem_MOC_HDR
+    HistogramItem.h
+)
+
+qt4_wrap_cpp(
+    HistogramItem_MOC_SRC
+    ${HistogramItem_MOC_HDR}
+)
+
+add_library(
+    HistogramItem
+    STATIC
+    HistogramItem.cpp
+    ${HistogramItem_MOC_SRC}
+)
+
+target_link_libraries(
+    HistogramItem
+    ${QT_QTCORE_LIBRARY}
+    ${QWT_LIBRARIES}
+)

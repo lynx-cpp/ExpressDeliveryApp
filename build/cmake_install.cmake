@@ -1,4 +1,4 @@
-# Install script for directory: /home/lynx/src/ExpressDeviveryApp
+# Install script for directory: /home/lynx/src/github_tmp/ExpressDeliveryApp
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,7 +34,10 @@ ENDIF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 
 IF(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  INCLUDE("/home/lynx/src/ExpressDeviveryApp/build/RegisterApp/cmake_install.cmake")
+  INCLUDE("/home/lynx/src/github_tmp/ExpressDeliveryApp/build/UserInfo/cmake_install.cmake")
+  INCLUDE("/home/lynx/src/github_tmp/ExpressDeliveryApp/build/md5/cmake_install.cmake")
+  INCLUDE("/home/lynx/src/github_tmp/ExpressDeliveryApp/build/DateDialog/cmake_install.cmake")
+  INCLUDE("/home/lynx/src/github_tmp/ExpressDeliveryApp/build/HistogramItem/cmake_install.cmake")
 
 ENDIF(NOT CMAKE_INSTALL_LOCAL_ONLY)
 
@@ -44,7 +47,7 @@ ELSE(CMAKE_INSTALL_COMPONENT)
   SET(CMAKE_INSTALL_MANIFEST "install_manifest.txt")
 ENDIF(CMAKE_INSTALL_COMPONENT)
 
-FILE(WRITE "/home/lynx/src/ExpressDeviveryApp/build/${CMAKE_INSTALL_MANIFEST}" "")
+FILE(WRITE "/home/lynx/src/github_tmp/ExpressDeliveryApp/build/${CMAKE_INSTALL_MANIFEST}" "")
 FOREACH(file ${CMAKE_INSTALL_MANIFEST_FILES})
-  FILE(APPEND "/home/lynx/src/ExpressDeviveryApp/build/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
+  FILE(APPEND "/home/lynx/src/github_tmp/ExpressDeliveryApp/build/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
 ENDFOREACH(file)

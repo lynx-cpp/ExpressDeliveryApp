@@ -1,1 +1,0 @@
-/usr/bin/c++       CMakeFiles/ExpressDeviveryApp.dir/ExpressDeviveryApp.cpp.o CMakeFiles/ExpressDeviveryApp.dir/main.cpp.o CMakeFiles/ExpressDeviveryApp.dir/RegisterApp/RegisterApp.cpp.o  -o ExpressDeviveryApp -rdynamic -lQtCore -lQtGui -lQtSql 
