@@ -35,35 +35,41 @@ QString encode(const QString& password)
 
 void ExpressDeliveryApp::showAllColumn()
 {
-    for (int i=0;i<MAX_COL;i++)
+    for (int i=0; i<MAX_COL; i++)
         m_tableView->showColumn(i);
 }
 
 void ExpressDeliveryApp::loadPlaceInfo(const QString& path)
 {
+    if (!isAdmin){
+        showMessage("You are not administrator , you cannot import place info!");
+        return ;
+    }
     QFile file(path);
-    if (!file.open(QIODevice::ReadOnly)){
+    if (!file.open(QIODevice::ReadOnly)) {
         showMessage("Failed opening file");
         return ;
     }
     bool ok;
     QVariantMap info = parser.parse(&file,&ok).toMap();
-    if (!ok){
+    if (!ok) {
         showMessage("failed converting data!");
         return ;
     }
     QSqlQuery query(database);
-    for (QVariantMap::iterator it=info.begin();it!=info.end();it++){
-        QString queryStr("INSERT INTO `%1`.`place_to_place` (`from_place` `to_place` `costing` `price`) VALUES ('%2', '%3', %4, %5);");
+    for (QVariantMap::iterator it=info.begin(); it!=info.end(); it++) {
+        QString queryStr("INSERT INTO `%1`.`place_to_place` (`from_place`,`to_place`,`costing`,`price`) VALUES ('%2', '%3', %4, %5);");
         QVariantMap toPlaceMap = it.value().toMap();
-        for (QVariantMap::iterator j=toPlaceMap.begin();j!=toPlaceMap.end();j++){
+        for (QVariantMap::iterator j=toPlaceMap.begin(); j!=toPlaceMap.end(); j++) {
             QVariantMap cur = j.value().toMap();
-            query.exec(queryStr.arg(schemeName)
-            .arg(it.key())
-            .arg(j.key())
-            .arg(cur["costing"].toDouble())
-            .arg(cur["price"].toDouble())
-            );
+            bool ok = query.exec(queryStr.arg(schemeName)
+                       .arg(it.key())
+                       .arg(j.key())
+                       .arg(cur["costing"].toDouble())
+                       .arg(cur["price"].toDouble())
+                      );
+            if (!ok)
+                showMessage("Import one item failed with error : " + query.lastError().text());
         }
     }
     showMessage("Import success!");
@@ -72,7 +78,7 @@ void ExpressDeliveryApp::loadPlaceInfo(const QString& path)
 void ExpressDeliveryApp::exportPlaceInfo(const QString& path)
 {
     QFile file(path);
-    if (!file.open(QIODevice::WriteOnly)){
+    if (!file.open(QIODevice::WriteOnly)) {
         showMessage("Failed opening file");
         return ;
     }
@@ -82,7 +88,7 @@ void ExpressDeliveryApp::exportPlaceInfo(const QString& path)
     QSqlQuery query(database);
     QString queryStr("SELECT * FROM `%1`.`place_to_place`");
     query.exec(queryStr.arg(schemeName));
-    while (query.next()){
+    while (query.next()) {
         QString fromPlace = getValue(query,"from_place").toString();
         QString toPlace = getValue(query,"to_place").toString();
         double costing = getValue(query,"costing").toDouble();
@@ -95,12 +101,13 @@ void ExpressDeliveryApp::exportPlaceInfo(const QString& path)
         toPlaceMap[toPlace] = cur;
         info[fromPlace] = toPlaceMap;
     }
-    bool ok;
-    serializer.serialize(QVariant(info),&file,&ok);
-    if (!ok)
-        showMessage("failed converting data!");
-    else
-        showMessage("Export success!");
+    //bool ok;
+    //serializer.serialize(info,&file,&ok);
+    QByteArray array = serializer.serialize(QVariant(info));
+    file.write(array);
+    file.close();
+    //qDebug() << array;
+    showMessage("Export success!");
 }
 
 void ExpressDeliveryApp::getStatistics(const QDate& date, double& got, double& spent)
@@ -110,8 +117,8 @@ void ExpressDeliveryApp::getStatistics(const QDate& date, double& got, double& s
     WHERE (`order_list`.`order_sent_time`>='%2') AND (`order_list`.`order_sent_time`<'%3')";
     QSqlQuery query(database);
     query.exec(queryStr.arg(schemeName)
-    .arg(QDateTime(date,QTime(0,0)).toString(TIME_FORMAT))
-    .arg(QDateTime(date.addDays(1),QTime(0,0)).toString(TIME_FORMAT)));
+               .arg(QDateTime(date,QTime(0,0)).toString(TIME_FORMAT))
+               .arg(QDateTime(date.addDays(1),QTime(0,0)).toString(TIME_FORMAT)));
     query.next();
     got = getValue(query,"tot_price").toDouble();
     spent = getValue(query,"tot_costing").toDouble();
@@ -128,17 +135,17 @@ void ExpressDeliveryApp::showMessage(const QString& message)
 QString ExpressDeliveryApp::setFilter(const QString& table,const QString& time)
 {
     QString filter = "";
-    if (m_idFilterCheckBox->checkState()){
+    if (m_idFilterCheckBox->checkState()) {
         filter += QString("(%1.id>=%2 AND %1.id<=%3)").arg(table).arg(filterFromId).arg(filterToId);
     }
-    if (m_timeFilterCheckBox->checkState() && time!=""){
+    if (m_timeFilterCheckBox->checkState() && time!="") {
         if (filter!="")
             filter += " AND ";
         filter += QString("(%1.%2>='%3' AND %1.%2<='%4')")
-        .arg(table)
-        .arg(time)
-        .arg(filterFromTime.toString(TIME_FORMAT))
-        .arg(filterToTime.toString(TIME_FORMAT));
+                  .arg(table)
+                  .arg(time)
+                  .arg(filterFromTime.toString(TIME_FORMAT))
+                  .arg(filterToTime.toString(TIME_FORMAT));
     }
     return filter;
 }
@@ -156,7 +163,7 @@ void ExpressDeliveryApp::showUserInformation()
     tableModel->setHeaderData(4,Qt::Horizontal, tr("is Admin"));
     tableModel->setHeaderData(5,Qt::Horizontal, tr("Password"));
     tableModel->setHeaderData(6,Qt::Horizontal, tr("Telephone"));
-    
+
     m_tableView->setModel(tableModel);
     showAllColumn();
     //m_tableView->hideColumn(0);
@@ -166,7 +173,7 @@ void ExpressDeliveryApp::showUserInformation()
 
 void ExpressDeliveryApp::showOrderInformation(bool onlyMe)
 {
-    if (!loggedIn){
+    if (!loggedIn) {
         showMessage("Please log in first!");
         return ;
     }
@@ -175,7 +182,7 @@ void ExpressDeliveryApp::showOrderInformation(bool onlyMe)
     tableModel->setRelation(4, QSqlRelation("order_category","id","order_category_name"));
     tableModel->setRelation(5, QSqlRelation("account","id","account_name"));
     //tableModel->setRelation(6, QSqlRelation("delivery","id","postman_telephone"));
-    if (!isAdmin || onlyMe){
+    if (!isAdmin || onlyMe) {
         QString filter = "account_id='%1'";
         QString extFilter = setFilter("order_list","order_sent_time");
         if (extFilter!="")
@@ -183,7 +190,7 @@ void ExpressDeliveryApp::showOrderInformation(bool onlyMe)
         else
             tableModel->setFilter(filter.arg(accountId));
     }
-    else{
+    else {
         if (setFilter("order_list","order_sent_time")!="")
             tableModel->setFilter(setFilter("order_list","order_sent_time"));
     }
@@ -201,7 +208,7 @@ void ExpressDeliveryApp::showOrderInformation(bool onlyMe)
     tableModel->setHeaderData(9,Qt::Horizontal, tr("Postman Phone"));
     tableModel->setHeaderData(10,Qt::Horizontal, tr("Delivery Start"));
     tableModel->setHeaderData(11,Qt::Horizontal, tr("Delivery Arrival"));
-    
+
     m_tableView->setModel(tableModel);
     showAllColumn();
     if (!isAdmin)
@@ -221,7 +228,7 @@ void ExpressDeliveryApp::showOrderTypeInformation()
     tableModel->setHeaderData(3,Qt::Horizontal, "Costing");
     m_tableView->setModel(tableModel);
     showAllColumn();
-    if (!isAdmin){
+    if (!isAdmin) {
         qDebug() << "not admin , so hide costing";
         m_tableView->hideColumn(3);
     }
@@ -237,7 +244,7 @@ void ExpressDeliveryApp::showPlaceInformation()
     tableModel->setHeaderData(2,Qt::Horizontal,"Costing");
     tableModel->setHeaderData(3,Qt::Horizontal,"Price");
     tableModel->select();
-    
+
     m_tableView->setModel(tableModel);
     showAllColumn();
     if (!isAdmin)
@@ -247,10 +254,10 @@ void ExpressDeliveryApp::showPlaceInformation()
 }
 
 ExpressDeliveryApp::ExpressDeliveryApp(QWidget* parent, Qt::WindowFlags flags):QMainWindow(parent,flags),
-m_ui(new Ui::MainWindow)
+    m_ui(new Ui::MainWindow)
 {
     m_ui->setupUi(this);
-    
+
     m_actionLogin = m_ui->actionLogin;
     m_actionNew_Order = m_ui->actionNew_Order;
     m_actionOrder = m_ui->actionOrder;
@@ -280,7 +287,7 @@ m_ui(new Ui::MainWindow)
     m_actionNew_Place_Info = m_ui->actionNew_Place_Info;
     m_actionExport = m_ui->actionExport;
     m_actionImport = m_ui->actionImport;
-    
+
     connect(m_actionLogin,SIGNAL(triggered(bool)),this,SLOT(actionLoginTriggered()));
     connect(m_actionNew_Order,SIGNAL(triggered(bool)),this,SLOT(actionNewOrderTriggered()));
     connect(m_actionOrder,SIGNAL(triggered(bool)),this,SLOT(actionOrderTriggered()));
@@ -305,7 +312,7 @@ m_ui(new Ui::MainWindow)
     connect(m_actionNew_Place_Info, SIGNAL(triggered(bool)),this, SLOT(actionNew_Place_InfoTriggered()));
     connect(m_actionExport, SIGNAL(triggered(bool)),this, SLOT(actionExportTriggered()));
     connect(m_actionImport, SIGNAL(triggered(bool)),this, SLOT(actionImportTriggered()));
-    
+
     schemeName = "ExpressDelivery";
     driverName = "QMYSQL";
     hostName = "localhost";
@@ -321,12 +328,12 @@ m_ui(new Ui::MainWindow)
     database.setHostName(hostName);
     database.setUserName(db_userName);
     database.setPassword(db_password);
-    
+
     address = accountName = userName = "";
     loggedIn = false;
     isAdmin = false;
     isAvailable = false;
-    if (database.open()==true){
+    if (database.open()==true) {
         showMessage("Database opened successfully!");
         isAvailable = true;
     }
@@ -349,7 +356,7 @@ ExpressDeliveryApp::~ExpressDeliveryApp()
 
 void ExpressDeliveryApp::actionLoginTriggered()
 {
-    if (!isAvailable){
+    if (!isAvailable) {
         showMessage("Database is not available,please check if MySQL works!");
         return ;
     }
@@ -357,19 +364,19 @@ void ExpressDeliveryApp::actionLoginTriggered()
     accountName = QInputDialog::getText(NULL,tr("username : "),
                                         tr("User Name"),
                                         QLineEdit::Normal
-    );
+                                       );
     password = QInputDialog::getText(NULL,tr("Password : "),
                                      tr("Password"),
                                      QLineEdit::Password
-    );
+                                    );
     QSqlQuery query(
         "select * from account where account_name='" + accountName + "' and password='" + encode(password)+ "'",
-                    database
+        database
     );
     if (!query.exec())
         showMessage("Error while trying to log in!");
     loggedIn = query.next();
-    if (!loggedIn){
+    if (!loggedIn) {
         showMessage("Username or Password wrong!");
         return ;
     }
@@ -382,12 +389,12 @@ void ExpressDeliveryApp::actionLoginTriggered()
     isAdmin = getValue(query,"is_admin").toBool();
     telephone = getValue(query,"telephone").toString();
     qDebug() << accountName << " " << address << " "<< userName << " " << isAdmin;
-    if (isAdmin){
+    if (isAdmin) {
         QSqlQuery data(database);
         data.exec("select account_name,user_name,address,is_admin from account");
         showUserInformation();
     }
-    else{
+    else {
         m_tableView->setModel(NULL);
         showOrderInformation();
     }
@@ -395,7 +402,7 @@ void ExpressDeliveryApp::actionLoginTriggered()
 
 void ExpressDeliveryApp::actionNewOrderTriggered()
 {
-    if (!loggedIn){
+    if (!loggedIn) {
         showMessage("Please log in first");
         emit actionLoginTriggered();
         return ;
@@ -405,19 +412,19 @@ void ExpressDeliveryApp::actionNewOrderTriggered()
     QString queryStr,fromPlace,toPlace;
     int categoryID;
     double price,costing;
-    do{
+    do {
         fromPlace = QInputDialog::getText(this,"from place","where your order will start from?",QLineEdit::Normal,"",&ok);
         if (!ok)
             break;
-        
+
         toPlace = QInputDialog::getText(this,"to place","where your order will arrive at?",QLineEdit::Normal,"",&ok);
         if (!ok)
             break;
-        
+
         query.exec("select distinct order_category_name from order_category");
         QStringList items;
         items.clear();
-        while (query.next()){
+        while (query.next()) {
             items << getValue(query,"order_category_name").toString();
         }
         QString category = QInputDialog::getItem(this,"category","what category will your order be?",items,0,false,&ok);
@@ -430,16 +437,16 @@ void ExpressDeliveryApp::actionNewOrderTriggered()
         price = getValue(query,"price").toDouble();
         costing = getValue(query,"costing").toDouble();
     } while (0);
-    if (!ok){
+    if (!ok) {
         showMessage("New Order Operation Canceled");
         return ;
     }
     queryStr = "SELECT * FROM `%1`.`place_to_place` WHERE from_place='%2' and to_place='%3'";
     query.exec(queryStr.arg(schemeName)
-    .arg(fromPlace)
-    .arg(toPlace)
-    );
-    if (!query.next()){
+               .arg(fromPlace)
+               .arg(toPlace)
+              );
+    if (!query.next()) {
         showMessage("route from " + fromPlace + " to " + toPlace + " is not supported");
         return ;
     }
@@ -447,15 +454,15 @@ void ExpressDeliveryApp::actionNewOrderTriggered()
     costing += getValue(query,"costing").toDouble();
     queryStr = "INSERT INTO `%1`.`order_list` (`from_place`, `to_place`, `order_sent_time`, `order_category_id`, `account_id`, `price`, `costing`) VALUES ('%2', '%3', '%4', %5, %6, %7, %8);";
     ok = query.exec(queryStr.arg(schemeName)
-    .arg(fromPlace)
-    .arg(toPlace)
-    .arg(QDateTime::currentDateTime().toString(TIME_FORMAT))
-    .arg(categoryID)
-    .arg(accountId)
-    .arg(price)
-    .arg(costing)
-    );
-    if (!ok){
+                    .arg(fromPlace)
+                    .arg(toPlace)
+                    .arg(QDateTime::currentDateTime().toString(TIME_FORMAT))
+                    .arg(categoryID)
+                    .arg(accountId)
+                    .arg(price)
+                    .arg(costing)
+                   );
+    if (!ok) {
         showMessage("Failed creating new order :" + query.lastError().text());
         return ;
     }
@@ -475,28 +482,28 @@ void ExpressDeliveryApp::actionOrderTriggered()
 
 void ExpressDeliveryApp::actionInformationTriggered()
 {
-    if (!loggedIn){
+    if (!loggedIn) {
         showMessage("Not logged in , no information to show");
         return ;
     }
     QString password = QInputDialog::getText(NULL,tr("Password : "),
-                                             tr("Password"),
-                                             QLineEdit::Password
-    );
+                       tr("Password"),
+                       QLineEdit::Password
+                                            );
     QSqlQuery query(
         "select * from account where account_name='" + accountName + "' and password='" + encode(password)+ "'",
-                    database
+        database
     );
-    if (!query.exec()){
+    if (!query.exec()) {
         showMessage("Error while trying authorize!");
         return ;
     }
     loggedIn = query.next();
-    if (!loggedIn){
+    if (!loggedIn) {
         showMessage("Password wrong!");
         return ;
     }
-    
+
     UserInfo* userInfo = new UserInfo(this);
     QEventLoop loop;
     connect(userInfo, SIGNAL(accepted()),&loop, SLOT(quit()));
@@ -505,31 +512,31 @@ void ExpressDeliveryApp::actionInformationTriggered()
     userInfo->setAddress(address);
     userInfo->setIsAdmin(isAdmin);
     userInfo->setTelephone(telephone);
-    do{
+    do {
         userInfo->show();
         loop.exec();
-    }while (userInfo->result()==QDialog::Accepted && (!check(userInfo)));
-    if (userInfo->result()==QDialog::Rejected){
+    } while (userInfo->result()==QDialog::Accepted && (!check(userInfo)));
+    if (userInfo->result()==QDialog::Rejected) {
         showMessage("Operation canceled");
         return ;
     }
     QString queryStr("UPDATE `%1`.`account` SET `account_name`='%2', `user_name`='%3', `address`='%4', `is_admin`=%5, `telephone`='%6' WHERE `id`='%7';");
     bool result = query.exec(queryStr.arg(schemeName)
-    .arg(userInfo->accountName())
-    .arg(userInfo->userName())
-    .arg(userInfo->address())
-    .arg(userInfo->isAdmin())
-    .arg(userInfo->telephone())
-    .arg(accountId)
-    );
-    if (!result){
+                             .arg(userInfo->accountName())
+                             .arg(userInfo->userName())
+                             .arg(userInfo->address())
+                             .arg(userInfo->isAdmin())
+                             .arg(userInfo->telephone())
+                             .arg(accountId)
+                            );
+    if (!result) {
         int error = query.lastError().number();
         if (error==1062)
             showMessage("Account name exists!");
         else
             showMessage("Database Operation failed : "+query.lastError().text());
     }
-    else{
+    else {
         showMessage("Register Operation succeeded: ");
     }
     delete userInfo;
@@ -541,33 +548,33 @@ void ExpressDeliveryApp::actionRegisterTriggered()
     QEventLoop loop;
     connect(registerApp, SIGNAL(accepted()),&loop, SLOT(quit()));
     connect(registerApp, SIGNAL(rejected()),&loop, SLOT(quit()));
-    do{
+    do {
         registerApp->show();
         loop.exec();
-    }while (registerApp->result()==QDialog::Accepted && (!check(registerApp)));
-    if (registerApp->result()==QDialog::Rejected){
+    } while (registerApp->result()==QDialog::Accepted && (!check(registerApp)));
+    if (registerApp->result()==QDialog::Rejected) {
         showMessage("Register operation canceled");
         return ;
     }
     QString queryStr("INSERT INTO `%1`.`account` (`account_name`, `user_name`, `address`, `is_admin`, `password`, `telephone`) VALUES ('%2', '%3', '%4', %5, '%6','%7');");
     QSqlQuery query(database);
     bool result = query.exec(
-        queryStr.arg(schemeName)
-        .arg(registerApp->accountName())
-        .arg(registerApp->userName())
-        .arg(registerApp->address())
-        .arg(registerApp->isAdmin())
-        .arg(encode(registerApp->password()))
-        .arg(registerApp->telephone())
-    );
-    if (!result){
+                      queryStr.arg(schemeName)
+                      .arg(registerApp->accountName())
+                      .arg(registerApp->userName())
+                      .arg(registerApp->address())
+                      .arg(registerApp->isAdmin())
+                      .arg(encode(registerApp->password()))
+                      .arg(registerApp->telephone())
+                  );
+    if (!result) {
         int error = query.lastError().number();
         if (error==1062)
             showMessage("Account name exists!");
         else
             showMessage("Database Operation failed : "+query.lastError().text());
     }
-    else{
+    else {
         showMessage("Register Operation succeeded: ");
     }
     delete registerApp;
@@ -576,27 +583,27 @@ void ExpressDeliveryApp::actionRegisterTriggered()
 bool ExpressDeliveryApp::check(const UserInfo* registerApp)
 {
     QMessageBox msgBox;
-    if (registerApp->accountName()==""){
+    if (registerApp->accountName()=="") {
         msgBox.setText("account name cannot be NULL!");
         msgBox.exec();
         return false;
     }
-    if (registerApp->address()==""){
+    if (registerApp->address()=="") {
         msgBox.setText("address cannot be NULL!");
         msgBox.exec();
         return false;
     }
-    if (registerApp->address()==""){
+    if (registerApp->address()=="") {
         msgBox.setText("password cannot be NULL!");
         msgBox.exec();
         return false;
     }
-    if (registerApp->isAdmin()==true && isAdmin==false){
+    if (registerApp->isAdmin()==true && isAdmin==false) {
         msgBox.setText("You are not administrator so you cannot register administrator account!");
         msgBox.exec();
         return false;
     }
-    if (registerApp->password()!=registerApp->verifiedPassword()){
+    if (registerApp->password()!=registerApp->verifiedPassword()) {
         msgBox.setText("Password mismatches repeated password!");
         msgBox.exec();
         return false;
@@ -649,7 +656,7 @@ void ExpressDeliveryApp::refreshButtonClicked()
 
 void ExpressDeliveryApp::removeButtonClicked()
 {
-    if (stat==NotSet){
+    if (stat==NotSet) {
         showMessage("Nothing to display , nothing to remove");
         return ;
     }
@@ -660,14 +667,14 @@ void ExpressDeliveryApp::removeButtonClicked()
 
 void ExpressDeliveryApp::actionOrderTypeAddTriggered()
 {
-    if (!isAdmin){
+    if (!isAdmin) {
         showMessage("You are not administrator , so you cannot add new order type!");
         return ;
     }
     bool ok;
     QString typeName;
     double price,costing;
-    do{
+    do {
         typeName = QInputDialog::getText(this,"Type Name","Input Type Name :",QLineEdit::Normal,"",&ok);
         if (!ok) break;
         price = QInputDialog::getDouble(this,"Price","Input Price :",-2147483648,2147483647,QLineEdit::Normal,2,&ok);
@@ -675,17 +682,17 @@ void ExpressDeliveryApp::actionOrderTypeAddTriggered()
         costing = QInputDialog::getDouble(this,"Costing","Input Costing :",-2147483648,2147483647,QLineEdit::Normal,2,&ok);
         if (!ok) break;
     } while (0);
-    if (!ok){
+    if (!ok) {
         showMessage("New Order Type operation canceled.");
         return ;
     }
     QString queryStr = "INSERT INTO `%1`.`order_category` (`order_category_name`,`price`,`costing`) VALUES ('%2', %3, %4);";
     QSqlQuery query(database);
     ok = query.exec(queryStr.arg(schemeName)
-    .arg(typeName)
-    .arg(price)
-    .arg(costing)
-    );
+                    .arg(typeName)
+                    .arg(price)
+                    .arg(costing)
+                   );
     if (!ok)
         showMessage("Database error : " + query.lastError().text());
     else
@@ -735,7 +742,7 @@ void ExpressDeliveryApp::toTimeChanged()
 
 void ExpressDeliveryApp::actionTodayTriggered()
 {
-    if (!isAdmin){
+    if (!isAdmin) {
         showMessage("You are not administrator , so you cannot view statistics");
         return ;
     }
@@ -755,7 +762,7 @@ void ExpressDeliveryApp::actionTodayTriggered()
 
 void ExpressDeliveryApp::actionOtherTimeTriggered()
 {
-    if (!isAdmin){
+    if (!isAdmin) {
         showMessage("You are not administrator , so you cannot view statistics");
         return ;
     }
@@ -764,7 +771,7 @@ void ExpressDeliveryApp::actionOtherTimeTriggered()
     connect(&dateDialog, SIGNAL(accepted()),&loop, SLOT(quit()));
     connect(&dateDialog, SIGNAL(rejected()),&loop, SLOT(quit()));
     QDate fromDate,toDate;
-    do{
+    do {
         dateDialog.setText("From Date : ");
         dateDialog.show();
         loop.exec();
@@ -778,33 +785,33 @@ void ExpressDeliveryApp::actionOtherTimeTriggered()
             break;
         toDate = dateDialog.getDate();
     } while (false);
-    if (dateDialog.result()==QDialog::Rejected){
+    if (dateDialog.result()==QDialog::Rejected) {
         showMessage("Statistics operation canceled");
         return ;
     }
     QwtPlot plot;
     plot.setTitle("Profit histogram of given date interval");
-    
+
     QwtPlotGrid* grid = new QwtPlotGrid;
     grid->enableXMin(true);
     grid->enableYMin(true);
     grid->setMajPen(QPen(Qt::black,0,Qt::DotLine));
     grid->setMinPen(QPen(Qt::gray, 0,Qt::DotLine));
     grid->attach(&plot);
-    
+
     int totDays = fromDate.daysTo(toDate) + 1;
-    
+
     HistogramItem* histogram = new HistogramItem;
     int numValues = totDays;
     QwtArray<QwtDoubleInterval> intervals(numValues);
     QwtArray<double> values(numValues);
     double width = 1.0;
-    
+
     double pos = 0.0;
     double tot_got,tot_spent;
     tot_got = tot_spent = 0;
     double max_val = -2147483647;
-    for (int i=0;i<numValues;i++){
+    for (int i=0; i<numValues; i++) {
         double got,spent;
         getStatistics(fromDate.addDays(i),got,spent);
         values[i] = got - spent;
@@ -818,14 +825,14 @@ void ExpressDeliveryApp::actionOtherTimeTriggered()
     }
     histogram->setData(QwtIntervalData(intervals,values));
     histogram->attach(&plot);
-    
+
     qDebug() << max_val;
     plot.setAxisScale(QwtPlot::yLeft,0.0,max_val);
     plot.setAxisScale(QwtPlot::xBottom,0.0,pos + 3);
     plot.replot();
     plot.resize(600,400);
     plot.show();
-    
+
     QMessageBox msgBox(this);
     QString text = "\
     Total Got     : %1      \n\
@@ -844,14 +851,14 @@ void ExpressDeliveryApp::actionList_Place_InfoTriggered()
 
 void ExpressDeliveryApp::actionNew_Place_InfoTriggered()
 {
-    if (!isAdmin){
+    if (!isAdmin) {
         showMessage("You are not administrator , so you cannot add new place info!");
         return ;
     }
     QString fromPlace,toPlace;
     bool ok;
     double costing,price;
-    do{
+    do {
         fromPlace = QInputDialog::getText(this,"From Place","Please Input 'From Place' :",QLineEdit::Normal,"",&ok);
         if (!ok)
             break;
@@ -865,22 +872,22 @@ void ExpressDeliveryApp::actionNew_Place_InfoTriggered()
         price = QInputDialog::getDouble(this,"Price","Please Input Price :",0,-2147483647,2147483647,
                                         2,&ok);
     } while (0);
-    if (!ok){
+    if (!ok) {
         showMessage("New Place operation canceled!");
         return ;
     }
-    
+
     QSqlQuery query(database);
     QString queryStr("INSERT INTO `%1`.`place_to_place` (`from_place`, `to_place`, `costing`, `price`) VALUES ('%2', '%3', %4, %5)");
     ok = query.exec(queryStr.arg(schemeName)
-    .arg(fromPlace)
-    .arg(toPlace)
-    .arg(costing)
-    .arg(price)
-    );
+                    .arg(fromPlace)
+                    .arg(toPlace)
+                    .arg(costing)
+                    .arg(price)
+                   );
     if (ok)
         showMessage("Successfully added place info!");
-    else{
+    else {
         showMessage("Failed adding place info!");
         qDebug() << query.lastError();
     }
@@ -890,8 +897,8 @@ void ExpressDeliveryApp::actionNew_Place_InfoTriggered()
 void ExpressDeliveryApp::actionExportTriggered()
 {
     QString fileName = QFileDialog::getSaveFileName(this, "Export File"
-        ,"~/tmp/"
-    );
+                       ,"~/tmp/"
+                                                   );
     exportPlaceInfo(fileName);
 }
 
@@ -900,8 +907,8 @@ void ExpressDeliveryApp::actionImportTriggered()
 {
     //loadPlaceInfo("/home/lynx/tmp/1111");
     QString fileName = QFileDialog::getOpenFileName(this, "Export File"
-        ,"~/tmp/"
-    );
+                       ,"~/tmp/"
+                                                   );
     loadPlaceInfo(fileName);
 }
 
