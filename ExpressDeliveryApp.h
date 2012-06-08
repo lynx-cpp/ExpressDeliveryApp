@@ -3,6 +3,11 @@
 
 #include <QtGui/QMainWindow>
 #include <QtSql>
+#include <QPair>
+#include <qjson/parser.h>
+#include <qjson/serializer.h>
+#include <qjson/parserrunnable.h>
+#include <qjson/serializerrunnable.h>
 #include "ui_main.h"
 #include "UserInfo/UserInfo.h"
 
@@ -33,6 +38,8 @@ private slots:
     void actionOtherTimeTriggered();
     void actionList_Place_InfoTriggered();
     void actionNew_Place_InfoTriggered();
+    void actionExportTriggered();
+    void actionImportTriggered();
     void submitButtonClicked();
     void discardButtonClicked();
     void addButtonClicked();
@@ -53,6 +60,8 @@ private:
     void showPlaceInformation();
     void getStatistics(const QDate& date,double& got,double& spent);
     void showAllColumn();
+    void loadPlaceInfo(const QString& );
+    void exportPlaceInfo(const QString& );
     QString setFilter(const QString& table = "order_list",const QString& time = "");
     
     //user information
@@ -66,9 +75,15 @@ private:
     QDateTime filterFromTime,filterToTime;
     int filterFromId,filterToId;
     
-    //other information
+    //database 
     QSqlDatabase database;
     QString schemeName,driverName,hostName,db_userName,db_password;
+    
+    //QJson
+    QJson::Parser parser;
+    QJson::Serializer serializer;
+    
+    //ui
     Ui::MainWindow* m_ui;
     QAction* m_actionLogin;
     QAction* m_actionOrder_from_Me;
@@ -84,6 +99,8 @@ private:
     QAction* m_actionOtherTime;
     QAction* m_actionList_Place_Info;
     QAction* m_actionNew_Place_Info;
+    QAction* m_actionImport;
+    QAction* m_actionExport;
     QPushButton* m_submitButton;
     QPushButton* m_discardButton;
     QPushButton* m_addbutton;
@@ -100,5 +117,7 @@ private:
     QTableView* m_tableView;
     QSqlRelationalTableModel* tableModel;
 };
+typedef QPair<QPair<QString,QString>,QPair<double,double> > PlaceInfo;
+typedef QMap<QPair<QString,QString>,QPair<double,double> > PlaceInfoMap;
 
 #endif // ExpressDeliveryApp_H

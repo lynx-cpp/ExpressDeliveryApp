@@ -295,6 +295,9 @@
     </property>
     <addaction name="actionList_Place_Info"/>
     <addaction name="actionNew_Place_Info"/>
+    <addaction name="separator"/>
+    <addaction name="actionImport"/>
+    <addaction name="actionExport"/>
    </widget>
    <addaction name="menuUser"/>
    <addaction name="menuOrder"/>
@@ -366,6 +369,16 @@
   <action name="actionNew_Place_Info">
    <property name="text">
     <string>New Place Info</string>
+   </property>
+  </action>
+  <action name="actionImport">
+   <property name="text">
+    <string>Import</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export</string>
    </property>
   </action>
  </widget>

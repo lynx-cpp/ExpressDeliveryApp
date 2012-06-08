@@ -39,6 +39,70 @@ void ExpressDeliveryApp::showAllColumn()
         m_tableView->showColumn(i);
 }
 
+void ExpressDeliveryApp::loadPlaceInfo(const QString& path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)){
+        showMessage("Failed opening file");
+        return ;
+    }
+    bool ok;
+    QVariantMap info = parser.parse(&file,&ok).toMap();
+    if (!ok){
+        showMessage("failed converting data!");
+        return ;
+    }
+    QSqlQuery query(database);
+    for (QVariantMap::iterator it=info.begin();it!=info.end();it++){
+        QString queryStr("INSERT INTO `%1`.`place_to_place` (`from_place` `to_place` `costing` `price`) VALUES ('%2', '%3', %4, %5);");
+        QVariantMap toPlaceMap = it.value().toMap();
+        for (QVariantMap::iterator j=toPlaceMap.begin();j!=toPlaceMap.end();j++){
+            QVariantMap cur = j.value().toMap();
+            query.exec(queryStr.arg(schemeName)
+            .arg(it.key())
+            .arg(j.key())
+            .arg(cur["costing"].toDouble())
+            .arg(cur["price"].toDouble())
+            );
+        }
+    }
+    showMessage("Import success!");
+}
+
+void ExpressDeliveryApp::exportPlaceInfo(const QString& path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly)){
+        showMessage("Failed opening file");
+        return ;
+    }
+    //PlaceInfoMap info;
+    QVariantMap info;
+    info.clear();
+    QSqlQuery query(database);
+    QString queryStr("SELECT * FROM `%1`.`place_to_place`");
+    query.exec(queryStr.arg(schemeName));
+    while (query.next()){
+        QString fromPlace = getValue(query,"from_place").toString();
+        QString toPlace = getValue(query,"to_place").toString();
+        double costing = getValue(query,"costing").toDouble();
+        double price = getValue(query,"price").toDouble();
+        QVariantMap toPlaceMap = info[fromPlace].toMap();
+        QVariantMap cur;
+        cur.clear();
+        cur["costing"] = costing;
+        cur["price"] = price;
+        toPlaceMap[toPlace] = cur;
+        info[fromPlace] = toPlaceMap;
+    }
+    bool ok;
+    serializer.serialize(QVariant(info),&file,&ok);
+    if (!ok)
+        showMessage("failed converting data!");
+    else
+        showMessage("Export success!");
+}
+
 void ExpressDeliveryApp::getStatistics(const QDate& date, double& got, double& spent)
 {
     QString queryStr = "SELECT SUM(`order_list`.`costing`) AS tot_costing,SUM(`order_list`.`price`) AS tot_price \
@@ -214,6 +278,8 @@ m_ui(new Ui::MainWindow)
     m_actionOtherTime = m_ui->actionOtherTime;
     m_actionList_Place_Info = m_ui->actionList_Place_Info;
     m_actionNew_Place_Info = m_ui->actionNew_Place_Info;
+    m_actionExport = m_ui->actionExport;
+    m_actionImport = m_ui->actionImport;
     
     connect(m_actionLogin,SIGNAL(triggered(bool)),this,SLOT(actionLoginTriggered()));
     connect(m_actionNew_Order,SIGNAL(triggered(bool)),this,SLOT(actionNewOrderTriggered()));
@@ -237,6 +303,8 @@ m_ui(new Ui::MainWindow)
     connect(m_actionOtherTime, SIGNAL(triggered(bool)),this, SLOT(actionOtherTimeTriggered()));
     connect(m_actionList_Place_Info, SIGNAL(triggered(bool)),this, SLOT(actionList_Place_InfoTriggered()));
     connect(m_actionNew_Place_Info, SIGNAL(triggered(bool)),this, SLOT(actionNew_Place_InfoTriggered()));
+    connect(m_actionExport, SIGNAL(triggered(bool)),this, SLOT(actionExportTriggered()));
+    connect(m_actionImport, SIGNAL(triggered(bool)),this, SLOT(actionImportTriggered()));
     
     schemeName = "ExpressDelivery";
     driverName = "QMYSQL";
@@ -795,7 +863,7 @@ void ExpressDeliveryApp::actionNew_Place_InfoTriggered()
         if (!ok)
             break;
         price = QInputDialog::getDouble(this,"Price","Please Input Price :",0,-2147483647,2147483647,
-                                          2,&ok);
+                                        2,&ok);
     } while (0);
     if (!ok){
         showMessage("New Place operation canceled!");
@@ -805,10 +873,10 @@ void ExpressDeliveryApp::actionNew_Place_InfoTriggered()
     QSqlQuery query(database);
     QString queryStr("INSERT INTO `%1`.`place_to_place` (`from_place`, `to_place`, `costing`, `price`) VALUES ('%2', '%3', %4, %5)");
     ok = query.exec(queryStr.arg(schemeName)
-        .arg(fromPlace)
-        .arg(toPlace)
-        .arg(costing)
-        .arg(price)
+    .arg(fromPlace)
+    .arg(toPlace)
+    .arg(costing)
+    .arg(price)
     );
     if (ok)
         showMessage("Successfully added place info!");
@@ -817,6 +885,24 @@ void ExpressDeliveryApp::actionNew_Place_InfoTriggered()
         qDebug() << query.lastError();
     }
     showPlaceInformation();
+}
+
+void ExpressDeliveryApp::actionExportTriggered()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, "Export File"
+        ,"~/tmp/"
+    );
+    exportPlaceInfo(fileName);
+}
+
+
+void ExpressDeliveryApp::actionImportTriggered()
+{
+    //loadPlaceInfo("/home/lynx/tmp/1111");
+    QString fileName = QFileDialog::getOpenFileName(this, "Export File"
+        ,"~/tmp/"
+    );
+    loadPlaceInfo(fileName);
 }
 
 #include "ExpressDeliveryApp.moc"
